@@ -1,5 +1,6 @@
 import plotly.graph_objs as go
 import pandas as pd
+from plotly.subplots import make_subplots
 
 """ LOAD DATA """
 ncov = pd.read_csv('COVID-19 Cases.csv', parse_dates=['Date'])
@@ -37,7 +38,7 @@ def get_df_for_country(df, country):
     return df[df['Country_Region'] == country]
 
 
-def get_scatter(x, y, name):
+def get_scatter(x, y, name, legend):
     """
     A function to abstract some Plotly interface.
 
@@ -48,8 +49,7 @@ def get_scatter(x, y, name):
     obj = go.Scatter(x=x,
                      y=y,
                      mode='lines',
-                     name=name
-                     )
+                     name=name,)
     return obj
 
 
@@ -70,10 +70,12 @@ def make_plot_for_country(case, country):
     return fig
 
 
-def make_plot_for_all_countries(case):
+def make_plot_for_all_countries(case, show_legend=True):
     """
-    A function that returns a dict for a plotly figure.
+    A function that returns a dict for a plotly figure using covid 19 data.
 
+    @type row: int representing where the plot should go
+    @type col: int representing where the plot should go
     @type case: str represents what case to grab for all countries
     """
     df = get_df_for_case(case)
@@ -83,24 +85,29 @@ def make_plot_for_all_countries(case):
 
     for country in countries:
         country_df = get_df_for_country(df, country)
-        data.append(get_scatter(country_df['Date'], country_df['Cases'], country))
+        data.append(get_scatter(country_df['Date'], country_df['Cases'], country, show_legend))
 
     layout = {'title': '{} for all countries.'.format(case)}
     return dict(data=data, layout=layout)
 
 
+def make_subplot(case1, case2):
+    """ Makes a subplot of multiple plots. Hard-coded right now. """
 
+    sub_plts = make_subplots(
+        rows=1,
+        cols=2,
+    )
 
+    data1 = make_plot_for_all_countries(case1)['data']
+    data2 = make_plot_for_all_countries(case2)['data']
 
+    def append_traces(data, row, col):
+        for i in range(len(data)):
+            sub_plts.append_trace(data[i], row, col)
 
+    append_traces(data1, row=1, col=1)
+    append_traces(data2, row=1, col=2)
 
-
-
-
-
-
-
-
-
-
-
+    sub_plts.update_layout(height=600, title_text="Side By Side Comparison: ")
+    return sub_plts
