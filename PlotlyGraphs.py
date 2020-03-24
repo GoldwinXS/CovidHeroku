@@ -38,7 +38,7 @@ def get_df_for_country(df, country):
     return df[df['Country_Region'] == country]
 
 
-def get_scatter(x, y, name, legend):
+def get_scatter(x, y, name, show_legend=True):
     """
     A function to abstract some Plotly interface.
 
@@ -49,7 +49,9 @@ def get_scatter(x, y, name, legend):
     obj = go.Scatter(x=x,
                      y=y,
                      mode='lines',
-                     name=name,)
+                     name=name,
+                     legendgroup=name,
+                     showlegend=show_legend)
     return obj
 
 
@@ -70,12 +72,11 @@ def make_plot_for_country(case, country):
     return fig
 
 
-def make_plot_for_all_countries(case, show_legend=True):
+def make_plot_for_all_countries(case, show_legend):
     """
     A function that returns a dict for a plotly figure using covid 19 data.
 
-    @type row: int representing where the plot should go
-    @type col: int representing where the plot should go
+    @type show_legend: bool to represent if we draw the legend or not
     @type case: str represents what case to grab for all countries
     """
     df = get_df_for_case(case)
@@ -99,8 +100,8 @@ def make_subplot(case1, case2):
         cols=2,
     )
 
-    data1 = make_plot_for_all_countries(case1)['data']
-    data2 = make_plot_for_all_countries(case2)['data']
+    data1 = make_plot_for_all_countries(case1, show_legend=True)['data']
+    data2 = make_plot_for_all_countries(case2, show_legend=False)['data']
 
     def append_traces(data, row, col):
         for i in range(len(data)):
