@@ -5,13 +5,11 @@ from dash.dependencies import Output, Input
 
 from PlotlyGraphs import make_plot_for_all_countries
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 """ 
 WEB LOCATION
 
 https://ncov19-visualization.herokuapp.com/ | https://git.heroku.com/ncov19-visualization.git
-
 
 """
 case = 'Deaths'
@@ -21,6 +19,7 @@ fig = make_plot_for_all_countries(case)
 
 """ PREPARE APP """
 
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
