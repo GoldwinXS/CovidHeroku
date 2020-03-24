@@ -10,7 +10,8 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 """ 
 WEB LOCATION
 
-https://goldwin-heroku-test.herokuapp.com/ | https://git.heroku.com/goldwin-heroku-test.git
+https://ncov19-visualization.herokuapp.com/ | https://git.heroku.com/ncov19-visualization.git
+
 
 """
 case = 'Deaths'
@@ -26,7 +27,7 @@ server = app.server
 
 app.layout = html.Div([
 
-    html.H2('Hello World'),
+    html.H2('COVID-19 Data Visualization by Goldwin Stewart'),
     dcc.Dropdown(
         id='dropdown',
         options=[{'label': i, 'value': i} for i in ['Recovered', 'Deaths', 'Confirmed', 'Active']],
