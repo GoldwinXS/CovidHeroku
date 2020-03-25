@@ -21,26 +21,20 @@ https://ncov19-visualization.herokuapp.com/ | https://git.heroku.com/ncov19-visu
 cases = ['Deaths', 'Active']
 country = 'Canada'
 explanatory_text = """
+Welcome to my data exploration of **Covid-19** 
 
-Welcome to my data exploration of **Covid-19!** 
-
-Let's take a look at the data together to try and understand what's going on!
-
-
-
+Let's take a look at the data __together__ to try and understand what's going on!
 """
 markdown_text = """ 
-
-
-
-
 ## Fit a model to the data! ##
 
 Try it out by adjusting the parameters.
 
+COMING SOON!  :D 
+"""
 
-
-
+markdown_text_author = """
+Author: Goldwin Stewart 
 """
 
 """ PREPARE APP """
@@ -55,7 +49,7 @@ app.layout = Div([
     Div(html.H2('COVID-19 Data Visualization and Modeling', style={'textAlign': 'center'}),
         className='app-header'),
 
-    Row([Col(Div(P(explanatory_text, style={'textAlign': 'center'})), className='background')]),
+    Row([Col(Div(dcc.Markdown(explanatory_text, style={'textAlign': 'center'})))]),
 
     Row([
         Col(
@@ -99,6 +93,8 @@ app.layout = Div([
     # html.Div(id='display-value'),
 
     Div(dcc.Graph(id='model-fit')),
+
+Div(dcc.Markdown(markdown_text_author))
 
 ], id='Main')
 
