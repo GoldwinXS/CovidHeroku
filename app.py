@@ -7,7 +7,7 @@ from dash_html_components import Div, P
 from dash.dependencies import Output, Input
 import dash_bootstrap_components as dbc
 from dash_bootstrap_components import Row, Col
-from PlotlyGraphs import make_plot_for_all_countries, make_subplot
+from PlotlyGraphs import make_subplot, make_model_fit_plot, ncov
 
 """ 
 WEB LOCATION
@@ -20,8 +20,24 @@ https://ncov19-visualization.herokuapp.com/ | https://git.heroku.com/ncov19-visu
 
 cases = ['Deaths', 'Active']
 country = 'Canada'
-# fig = make_plot_for_all_countries(case)
-explanatory_text = 'Visualize Covid-19 Data with me! Click on the two dropdowns to compare different types of cases'
+explanatory_text = """
+
+Welcome to my data exploration of Covid-19! 
+
+"""
+markdown_text = """ 
+
+
+
+
+## Fit a model to the data! ##
+
+Try it out by adjusting the parameters.
+
+
+
+
+"""
 
 """ PREPARE APP """
 
@@ -34,7 +50,8 @@ app.layout = Div([
 
     Div(html.H2('COVID-19 Data Visualization by Goldwin Stewart', style={'textAlign': 'center'}),
         className='app-header'),
-    Row([Col(Div(P(explanatory_text)), width=5, className='background')], justify='around'),
+
+    Row([Col(Div(P(explanatory_text, style={'textAlign': 'center'})), className='background')]),
 
     Row([
         Col(
@@ -42,8 +59,7 @@ app.layout = Div([
                 Dropdown(
                     id='dropdown',
                     options=[{'label': i, 'value': i} for i in ['Recovered', 'Deaths', 'Confirmed', 'Active']],
-                    value=cases[0]), className='button', style={'backgroundColor': 'black'}), width=3),
-
+                    value=cases[0]), className='button'), width=3),
         Col(
             Div(
                 Dropdown(
@@ -53,19 +69,45 @@ app.layout = Div([
 
     ], justify='around', ),
 
-    # html.Div(id='display-value'),
     dcc.Graph(id='test'),
-], style={'backgroundColor': 'black'}, id='Main')
 
+    dcc.Markdown(markdown_text,id = 'MarkdownText', style={'textAlign': 'center', 'backgroudColor': '#1a1c23'}),
 
-# @app.callback(Output('display-value', 'children'), [Input('dropdown', 'value')])
-# def display_value(value):
-#     return 'You have selected "{}"'.format(value)
+    Row([
+        Col(
+            Div(
+                Dropdown(id='country-selection',
+                         options=[{'label': i, 'value': i} for i in ncov.Country_Region.unique()],
+                         value='Canada',
+                         className='button')
+            )
+        ),
+        Col(
+            Div(
+                Dropdown(id='case-selection',
+                         options=[{'label': i, 'value': i} for i in ['Recovered', 'Deaths', 'Confirmed', 'Active']],
+                         value='Recovered',
+                         className='button')
+            )
+        )
+    ]),
+
+    # html.Div(id='display-value'),
+
+    Div(dcc.Graph(id='model-fit')),
+
+], id='Main')
 
 
 @app.callback(Output('test', 'figure'), [Input('dropdown', 'value'), Input('dropdown2', 'value')])
 def change_case(value1, value2):
     fig = make_subplot(value1, value2)
+    return fig
+
+
+@app.callback(Output('model-fit', 'figure'), [Input('case-selection', 'value'), Input('country-selection', 'value')])
+def make_model(value1, value2):
+    fig = make_model_fit_plot(value1, value2)
     return fig
 
 

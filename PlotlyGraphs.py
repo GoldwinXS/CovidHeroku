@@ -2,6 +2,7 @@ import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
 import numpy as np
+from scipy.optimize import curve_fit
 
 """ LOAD DATA """
 ncov = pd.read_csv('COVID-19 Cases.csv', parse_dates=['Date'])
@@ -75,16 +76,11 @@ def make_plot_for_country(case, country):
     @param country: str of country
     @type case: str to describe what data we're looking at
     """
-    test_df = get_df_for_country(get_df_for_case('Active'), country)
+    test_df = get_df_for_country(get_df_for_case(case), country)
 
-    data = [get_scatter(test_df['Date'], test_df['Cases'], case)]
-    layout = go.Layout(plot_bgcolor='#111111', title='test')
-    # layout = {
-    #     'title': 'test',
-    #     'plot_bgcolor': '#111111',
-    #     'paper_bgcolor': '#111111',
-    #     'font': {'color': '#7FDBFF'}
-    # }
+    data = [get_scatter(test_df['Date'], test_df['Cases'], country)]
+    layout = go.Layout(plot_bgcolor='#1a1c23', title='test')
+
     fig = go.Figure(data=data, layout=layout)
 
     return fig
@@ -173,4 +169,62 @@ def make_subplot(case1, case2):
 
     return sub_plts
 
-# make_plot_for_all_countries('Deaths', show_legend=True)
+
+def make_model_fit_plot(case, country):
+    data = make_plot_for_country(case, country)
+
+    data.update_layout(height=700, title_text="Model fit: ")
+    data.layout.plot_bgcolor = '#1a1c23'
+    data.update_layout(paper_bgcolor="#1a1c23")
+    data.update_layout(font={'color': 'white'})
+
+    return data
+
+
+def exponential_model(x, a, b):
+    return a * b ** x
+
+
+def model(case, country):
+    data = get_df_for_country(get_df_for_case(case), country)
+    fit_data = data.Cases
+
+    uncertainty = [0.1] * fit_data.shape[0]
+    x = np.arange(fit_data.shape[0])
+    y = fit_data.tolist()
+
+    init_guess = [1, 1]
+
+    fit = curve_fit(exponential_model,
+                    x,
+                    y,
+                    sigma=uncertainty,
+                    p0=init_guess,
+                    absolute_sigma=True)
+
+    fit = tuple(fit[0])
+
+    days_to_future_predict = 0
+
+    data_age = 5
+    pred_length = 57 + data_age + days_to_future_predict
+    model_shift = 10
+
+    # previous_n_days = fit_data.shape[0]
+    print('predicting {} days into the future.'.format(days_to_future_predict))
+    new_x = np.arange(pred_length)
+    y = data.tolist()[:pred_length]
+    model_predictions = [model(pt, *fit) for pt in new_x]
+    shifted_model_predictions = [model(p + model_shift, *fit) for p in new_x]
+
+    # if len(y) < len(new_x):
+    #     y = y + [None] * (len(new_x) - len(y))
+
+    # df = pd.DataFrame({"x": new_x,
+    #                    'model_predictions': model_predictions,
+    #                    'shifted_model_predictions': shifted_model_predictions,
+    #                    'y': y,
+    #                    'canada_pop': [35000000 for _ in range(len(y))]})
+    # melted_df = df.melt(id_vars='x')
+
+    return fit
