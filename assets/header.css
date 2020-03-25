@@ -1,0 +1,94 @@
+.app-header {
+    /*text-decoration-color: #ffc261;*/
+    color: #ffc261;
+    height: 60px;
+    line-height: 60px;
+    background-color: #1a1c23;
+    /*border-bottom: thin lightgrey solid;*/
+}
+
+.justify-content-around {
+    background-color: #1a1c23;
+}
+
+.app-header .app-header--title {
+    /*color: #ffc261;*/
+    font-size: 22px;
+    padding-left: 5px;
+    background-color: #1a1c23;
+}
+
+.svg-container {
+    background-color: #1a1c23;
+}
+
+
+.js-plotly-plot {
+    background-color: #1a1c23;
+}
+
+.background {
+    color: #1a1c23;
+    background-color: #1a1c23;
+}
+
+.justify-content-around {
+    color: #1a1c23;
+    background-color: #1a1c23;
+}
+
+/* Buttons
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.button,
+button,
+input[type="button"] {
+    /*display: inline-block;*/
+    /*height: 38px;*/
+    /*padding: 0 30px;*/
+    color: #ffc261;
+    text-align: center;
+    /*font-size: 11px;*/
+    /*font-weight: 600;*/
+    /*line-height: 38px;*/
+    /*letter-spacing: .1rem;*/
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+    /*cursor: pointer;*/
+    box-sizing: border-box;
+}
+
+.button:hover,
+button:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="button"]:focus {
+    color: #ffc261;
+    border-color: #888;
+    outline: 0;
+}
+
+.button.button-primary,
+button.button-primary,
+input[type="button"].button-primary {
+    color: #ffc261;
+    background-color: #33C3F0;
+    border-color: #33C3F0;
+}
+
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="button"].button-primary:focus {
+    color: #ffc261;
+    background-color: #1EAEDB;
+    border-color: #1EAEDB;
+}
+
+

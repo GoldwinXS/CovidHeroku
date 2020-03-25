@@ -22,7 +22,11 @@ cases = ['Deaths', 'Active']
 country = 'Canada'
 explanatory_text = """
 
-Welcome to my data exploration of Covid-19! 
+Welcome to my data exploration of **Covid-19!** 
+
+Let's take a look at the data together to try and understand what's going on!
+
+
 
 """
 markdown_text = """ 
@@ -48,7 +52,7 @@ server = app.server
 
 app.layout = Div([
 
-    Div(html.H2('COVID-19 Data Visualization by Goldwin Stewart', style={'textAlign': 'center'}),
+    Div(html.H2('COVID-19 Data Visualization and Modeling', style={'textAlign': 'center'}),
         className='app-header'),
 
     Row([Col(Div(P(explanatory_text, style={'textAlign': 'center'})), className='background')]),
