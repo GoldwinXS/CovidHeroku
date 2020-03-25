@@ -9,7 +9,7 @@ ncov = pd.read_csv('COVID-19 Cases.csv', parse_dates=['Date'])
 
 def prepare_country_color_dict():
     """ Prepares a dictionary for plotly objects """
-    get_rand = lambda: np.random.randint(0, 255)
+    get_rand = lambda: np.random.randint(55, 255)
     random_colors_rgb = [(get_rand(), get_rand(), get_rand()) for _ in range(len(ncov.Country_Region.unique()))]
     return {country: 'rgba' + str(color + (1,)) for country, color in
             zip(ncov.Country_Region.unique(), random_colors_rgb)}
@@ -130,6 +130,14 @@ def shift_dates_to_match(df):
     return df
 
 
+def find_max_y_vals(plotly_go_obj):
+    m = 0
+    for elem in plotly_go_obj:
+        if max(elem['y']) > m:
+            m = max(elem['y'])
+    return m
+
+
 def make_subplot(case1, case2):
     """ Makes a subplot of multiple plots. Hard-coded right now. """
 
@@ -141,6 +149,14 @@ def make_subplot(case1, case2):
     data1 = make_plot_for_all_countries(case1, show_legend=True)['data']
     data2 = make_plot_for_all_countries(case2, show_legend=False)['data']
 
+    max_1 = find_max_y_vals(data1)
+    max_2 = find_max_y_vals(data2)
+
+    max_y_range = max(max_1, max_2)
+    min_y_range = min(max_1, max_2)
+
+    y_range = (max_y_range + min_y_range) // 2
+
     def append_traces(data, row, col):
         for i in range(len(data)):
             sub_plts.append_trace(data[i], row, col)
@@ -151,8 +167,10 @@ def make_subplot(case1, case2):
     sub_plts.update_layout(height=700, title_text="Side By Side Comparison: ")
     sub_plts.layout.plot_bgcolor = '#1a1c23'
     sub_plts.update_layout(paper_bgcolor="#1a1c23")
+    sub_plts.update_layout(font={'color': 'white'})
+    sub_plts.update_layout(yaxis={'range': [0, y_range]},
+                           yaxis2={'range': [0, y_range]})
 
     return sub_plts
 
-
-make_plot_for_all_countries('Deaths', show_legend=True)
+# make_plot_for_all_countries('Deaths', show_legend=True)
