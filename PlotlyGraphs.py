@@ -1,9 +1,21 @@
 import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
+import numpy as np
 
 """ LOAD DATA """
 ncov = pd.read_csv('COVID-19 Cases.csv', parse_dates=['Date'])
+
+
+def prepare_country_color_dict():
+    """ Prepares a dictionary for plotly objects """
+    get_rand = lambda: np.random.randint(0, 255)
+    random_colors_rgb = [(get_rand(), get_rand(), get_rand()) for _ in range(len(ncov.Country_Region.unique()))]
+    return {country: 'rgba' + str(color + (1,)) for country, color in
+            zip(ncov.Country_Region.unique(), random_colors_rgb)}
+
+
+country_color_dict = prepare_country_color_dict()
 
 
 def get_df_for_case(case):
@@ -49,6 +61,7 @@ def get_scatter(x, y, name, show_legend=True):
     obj = go.Scatter(x=x,
                      y=y,
                      mode='lines',
+                     marker={'color': country_color_dict[name]},
                      name=name,
                      legendgroup=name,
                      showlegend=show_legend)
@@ -56,7 +69,8 @@ def get_scatter(x, y, name, show_legend=True):
 
 
 def make_plot_for_country(case, country):
-    """ Returns figure data for a single country.
+    """
+    Returns figure data for a single country.
 
     @param country: str of country
     @type case: str to describe what data we're looking at
@@ -64,9 +78,13 @@ def make_plot_for_country(case, country):
     test_df = get_df_for_country(get_df_for_case('Active'), country)
 
     data = [get_scatter(test_df['Date'], test_df['Cases'], case)]
-    layout = {
-        'title': 'test',
-    }
+    layout = go.Layout(plot_bgcolor='#111111', title='test')
+    # layout = {
+    #     'title': 'test',
+    #     'plot_bgcolor': '#111111',
+    #     'paper_bgcolor': '#111111',
+    #     'font': {'color': '#7FDBFF'}
+    # }
     fig = go.Figure(data=data, layout=layout)
 
     return fig
@@ -92,6 +110,26 @@ def make_plot_for_all_countries(case, show_legend):
     return dict(data=data, layout=layout)
 
 
+def shift_dates_to_match(df):
+    pivoted = df.pivot(index='Date', columns='Country_Region')
+    pivoted = pivoted.reset_index()
+
+    def shift_column(country):
+        case_df = pivoted['Cases']
+        # shift_amt = case_df.shape[0]-case_df.dropna().shape[0]
+        non_nan_vals = case_df['Algeria'][case_df['Algeria'].fillna(0) != 0]
+        case_df = case_df['Algeria'].shift(case_df.shape[0])
+        case_df.iloc[:, :non_nan_vals.shape[0]] = non_nan_vals
+        # case_df = case_df.shift(int(-shift_amt))
+        pivoted['Cases'][country] = case_df
+
+    for country in df['Cases']:
+        shift_column(country)
+
+    # shift_col = lambda country,shift_amt:pivoted['Cases']
+    return df
+
+
 def make_subplot(case1, case2):
     """ Makes a subplot of multiple plots. Hard-coded right now. """
 
@@ -110,5 +148,11 @@ def make_subplot(case1, case2):
     append_traces(data1, row=1, col=1)
     append_traces(data2, row=1, col=2)
 
-    sub_plts.update_layout(height=600, title_text="Side By Side Comparison: ")
+    sub_plts.update_layout(height=700, title_text="Side By Side Comparison: ")
+    sub_plts.layout.plot_bgcolor = '#1a1c23'
+    sub_plts.update_layout(paper_bgcolor="#1a1c23")
+
     return sub_plts
+
+
+make_plot_for_all_countries('Deaths', show_legend=True)
